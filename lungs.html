@@ -103,6 +103,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const patientId = urlParams.get('patientId') || "N/A";
 const dob = urlParams.get('dob') || "N/A";
 const admissionDate = urlParams.get('admissionDate') || "N/A";
+const summary = urlParams.get('summary') || "N/A";  // ✅ Fetch summary
 
 document.getElementById('downloadPdfBtn').addEventListener('click', async function() {
     const container = document.querySelector('.container');
@@ -125,10 +126,15 @@ document.getElementById('downloadPdfBtn').addEventListener('click', async functi
     doc.text(`Date of Birth: ${dob}`, 40, 60);
     doc.text(`Admission Date: ${admissionDate}`, 40, 80);
 
+    // ✅ Add clinical summary (with wrapping)
+    const splitSummary = doc.splitTextToSize(`Clinical Summary: ${summary}`, 500);
+    doc.text(splitSummary, 40, 110);
+
     // Add container content
     const pdfWidth = doc.internal.pageSize.getWidth() - 80;
+    const yPos = 130 + (splitSummary.length * 14);
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    doc.addImage(imgData, 'PNG', 40, 100, pdfWidth, pdfHeight);
+    doc.addImage(imgData, 'PNG', 40, yPos, pdfWidth, pdfHeight);
 
     // Save PDF
     doc.save(`Patient_${patientId}_Lungs.pdf`);
