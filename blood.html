@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -99,7 +100,7 @@
 <script>
 const { jsPDF } = window.jspdf;
 
-// Get URL params
+// ✅ Get patient info from URL params
 const urlParams = new URLSearchParams(window.location.search);
 const patientId = urlParams.get('patientId') || "N/A";
 const dob = urlParams.get('dob') || "N/A";
@@ -108,9 +109,9 @@ const summary = urlParams.get('summary') || "N/A";
 
 document.getElementById('downloadPdfBtn').addEventListener('click', async function() {
     const container = document.querySelector('.container');
-    const buttons = container.querySelectorAll('.back-btn'); // buttons to hide
+    const buttons = container.querySelectorAll('.back-btn'); 
     
-    // Hide buttons temporarily
+    // Temporarily hide buttons
     buttons.forEach(btn => btn.style.display = 'none');
 
     // Capture container as image
@@ -122,27 +123,29 @@ document.getElementById('downloadPdfBtn').addEventListener('click', async functi
     doc.setFont('helvetica', 'normal');  
     doc.setFontSize(12);
 
-    // Add patient info at top
-    doc.text(`Patient ID: ${patientId}`, 40, 40);
-    doc.text(`Date of Birth: ${dob}`, 40, 60);
-    doc.text(`Admission Date: ${admissionDate}`, 40, 80);
+    // ✅ Add patient info (all four details at top)
+    let y = 40;
+    doc.text(`Patient ID: ${patientId}`, 40, y); y += 20;
+    doc.text(`Date of Birth: ${dob}`, 40, y); y += 20;
+    doc.text(`Admission Date: ${admissionDate}`, 40, y); y += 20;
 
-    // ✅ Add clinical summary (multi-line wrap if long)
+    // Wrap clinical summary
     const splitSummary = doc.splitTextToSize(`Clinical Summary: ${summary}`, 500);
-    doc.text(splitSummary, 40, 110);
+    doc.text(splitSummary, 40, y); 
+    y += splitSummary.length * 14 + 20;
 
-    // Add the captured page image below summary
-    const pdfWidth = doc.internal.pageSize.getWidth() - 80; // margins
-    const yPos = 130 + (splitSummary.length * 14); // adjust below summary
+    // Add guidelines screenshot under patient info
+    const pdfWidth = doc.internal.pageSize.getWidth() - 80;
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    doc.addImage(imgData, 'PNG', 40, yPos, pdfWidth, pdfHeight);
+    doc.addImage(imgData, 'PNG', 40, y, pdfWidth, pdfHeight);
 
-    // Save PDF
+    // ✅ Save PDF with correct infection type in filename
     doc.save(`Patient_${patientId}_Blood.pdf`);
 
     // Restore buttons
     buttons.forEach(btn => btn.style.display = 'inline-block');
 });
 </script>
+
 </body>
 </html>
