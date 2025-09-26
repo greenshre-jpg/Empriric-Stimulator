@@ -35,7 +35,7 @@
   </style>
 </head>
 <body>
-  <header><i class="fa-solid fa-notes-medical"></i> Skin & Soft Tissue Infections (SSTI)</header>
+  <header><i class="fa-solid fa-bandage"></i> Skin & Soft Tissue Infections (SSTI)</header>
 
   <div class="container">
     <h2>ICMR Guidelines – SSTI / SSI</h2>
@@ -62,38 +62,33 @@
 
     <h3>Local Resistance Data (SSTI)</h3>
     <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start;">
-
       <!-- Resistance Table -->
       <div style="flex:1; min-width:300px;">
         <table>
           <tr><th>Antibiotic</th><th>Skin And Soft Tissue Infection (%R)</th><th>Graph</th></tr>
           <tr><td>Cefuroxime</td><td>81%</td>
-            <td><i class="fa-solid fa-triangle-exclamation" style="color:#e74c3c; font-size:20px;"></i>
-              <div class="bar"><div class="fill high" style="width:81%"></div></div></td></tr>
+            <td><div class="bar"><div class="fill high" style="width:81%"></div></div></td></tr>
           <tr><td>Cotrimoxazole</td><td>52%</td>
-            <td><i class="fa-solid fa-circle-check" style="color:#f1c40f; font-size:20px;"></i>
-              <div class="bar"><div class="fill mid" style="width:52%"></div></div></td></tr>
+            <td><div class="bar"><div class="fill mid" style="width:52%"></div></div></td></tr>
           <tr><td>Clindamycin</td><td>7%</td>
-            <td><i class="fa-solid fa-circle-check" style="color:#4cb903; font-size:20px;"></i>
-              <div class="bar"><div class="fill low" style="width:7%"></div></div></td></tr>
+            <td><div class="bar"><div class="fill low" style="width:7%"></div></div></td></tr>
           <tr><td>Vancomycin</td><td>2%</td>
-            <td><i class="fa-solid fa-circle-check" style="color:#4cb903; font-size:20px;"></i>
-              <div class="bar"><div class="fill low" style="width:2%"></div></div></td></tr>
+            <td><div class="bar"><div class="fill low" style="width:2%"></div></div></td></tr>
         </table>
       </div>
 
       <!-- Summary Box -->
-      <div style="flex:0 0 300px; border:1px solid #16a085; border-radius:10px; background:#e6f7f4; padding:20px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+      <div id="summaryBox" style="flex:0 0 300px; border:1px solid #16a085; border-radius:10px; background:#e6f7f4; padding:20px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
         <h4 style="margin-top:0; color:#2c3e50;">Summary</h4>
         <p><strong>Preferred Antibiotic:</strong> Meropenem</p>
         <p><strong>Predominant Pathogen:</strong> E. Coli (25.4%)</p>
         <p><strong>Total Isolates:</strong> 321</p>
       </div>
-
     </div>
 
     <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Intake</a>
-    <button id="downloadPdfBtn" class="back-btn" style="margin-left:10px;"><i class="fa-solid fa-file-pdf"></i> Download PDF</button> 
+    <button id="downloadPdfBtn" class="back-btn" style="margin-left:10px;"><i class="fa-solid fa-file-pdf"></i> Download Full PDF</button>
+    <button id="downloadSummaryBtn" class="back-btn" style="margin-left:10px; background:#2c3e50;"><i class="fa-solid fa-file-contract"></i> Download Summary</button>
   </div>
 
 <script>
@@ -105,6 +100,7 @@ const patientId = urlParams.get('patientId') || "N/A";
 const dob = urlParams.get('dob') || "N/A";
 const admissionDate = urlParams.get('admissionDate') || "N/A";
 
+// Full PDF
 document.getElementById('downloadPdfBtn').addEventListener('click', async function() {
     const container = document.querySelector('.container');
     const buttons = container.querySelectorAll('.back-btn');
@@ -127,6 +123,28 @@ document.getElementById('downloadPdfBtn').addEventListener('click', async functi
 
     doc.save(`Patient_${patientId}_SSTI.pdf`);
     buttons.forEach(btn => btn.style.display = 'inline-block');
+});
+
+// Summary-only PDF
+document.getElementById('downloadSummaryBtn').addEventListener('click', function() {
+    const summary = document.getElementById('summaryBox').innerText;
+
+    const doc = new jsPDF('p', 'pt', 'a4');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+
+    doc.text(`Patient ID: ${patientId}`, 40, 40);
+    doc.text(`Date of Birth: ${dob}`, 40, 60);
+    doc.text(`Admission Date: ${admissionDate}`, 40, 80);
+
+    doc.setFontSize(14);
+    doc.text("Brief Summary (SSTI)", 40, 120);
+
+    doc.setFontSize(12);
+    const lines = doc.splitTextToSize(summary, 500);
+    doc.text(lines, 40, 150);
+
+    doc.save(`Patient_${patientId}_SSTI_Summary.pdf`);
 });
 </script>
 </body>
