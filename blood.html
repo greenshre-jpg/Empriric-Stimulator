@@ -75,13 +75,9 @@
           <tr><td>Piperacillin-tazobactam</td><td>24%</td>
             <td><i class="fa-solid fa-circle-check" style="color:#4cb903; font-size:20px;"></i>
               <div class="bar"><div class="fill low" style="width:24%"></div></div></td></tr>
-           <tr><td>Meropenem</td><td>23%</td>
-            <td><i class="fa-solid fa-circle-check" style="color:#4cb903; font-size:20px;"></i>
-              <div class="bar"><div class="fill low" style="width:23%"></div></div></td></tr>
           <tr><td>Cefoperazone-sulbactam</td><td>10%</td>
             <td><i class="fa-solid fa-circle-check" style="color:#4cb903; font-size:20px;"></i>
               <div class="bar"><div class="fill low" style="width:10%"></div></div></td></tr>
-         
         </table>
       </div>
 
@@ -108,6 +104,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const patientId = urlParams.get('patientId') || "N/A";
 const dob = urlParams.get('dob') || "N/A";
 const admissionDate = urlParams.get('admissionDate') || "N/A";
+const summary = urlParams.get('summary') || "N/A";
 
 document.getElementById('downloadPdfBtn').addEventListener('click', async function() {
     const container = document.querySelector('.container');
@@ -122,7 +119,7 @@ document.getElementById('downloadPdfBtn').addEventListener('click', async functi
 
     // Create PDF
     const doc = new jsPDF('p', 'pt', 'a4');
-    doc.setFont('helvetica', 'normal');  // professional font
+    doc.setFont('helvetica', 'normal');  
     doc.setFontSize(12);
 
     // Add patient info at top
@@ -130,10 +127,15 @@ document.getElementById('downloadPdfBtn').addEventListener('click', async functi
     doc.text(`Date of Birth: ${dob}`, 40, 60);
     doc.text(`Admission Date: ${admissionDate}`, 40, 80);
 
-    // Add the captured page image below patient info
+    // ✅ Add clinical summary (multi-line wrap if long)
+    const splitSummary = doc.splitTextToSize(`Clinical Summary: ${summary}`, 500);
+    doc.text(splitSummary, 40, 110);
+
+    // Add the captured page image below summary
     const pdfWidth = doc.internal.pageSize.getWidth() - 80; // margins
+    const yPos = 130 + (splitSummary.length * 14); // adjust below summary
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    doc.addImage(imgData, 'PNG', 40, 100, pdfWidth, pdfHeight);
+    doc.addImage(imgData, 'PNG', 40, yPos, pdfWidth, pdfHeight);
 
     // Save PDF
     doc.save(`Patient_${patientId}_Blood.pdf`);
@@ -142,7 +144,5 @@ document.getElementById('downloadPdfBtn').addEventListener('click', async functi
     buttons.forEach(btn => btn.style.display = 'inline-block');
 });
 </script>
-
 </body>
 </html>
-
